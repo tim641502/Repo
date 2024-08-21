@@ -8,9 +8,9 @@ Setup a helm chart in the repo- these provide instructions on how to deploy dock
 
 3. Build pipeline
 
-In Azure devops, create a build pipeline for the service. Update the YAML to build the docker file (which will be stored in an Azure Container Registry, for the helm chart to pickup), run any unit tests (and fail the build if any fail), and then build and publish the 
-helm chart. The published helm chart needs to be stored in a helm registry in Azure for later use. 
-To run this pipeline we will need a build agent- these can be setup in the Azure portal, and then linked back to the build pipeline in devops. Ideally a virtual machine scale-set would be used- this can be configured to create or delete agent instances on the 
+In Azure devops, create a build pipeline for the service. Update the YAML to build the docker file (which will be stored in an Azure Container Registry, for the helm chart to pickup), run any unit tests (and fail the build 
+if any fail), and then build and publish the helm chart. The published helm chart needs to be stored in a helm registry in Azure for later use. To run this pipeline we will need a build agent- these can be setup in the Azure 
+portal, and then linked back to the build pipeline in devops. Ideally a virtual machine scale-set would be used- this can be configured to create or delete agent instances on the 
 fly, depending on demand.
 
 4. Terraform
@@ -21,9 +21,12 @@ We will use Terraform to setup the azure container regsitry, the helm registry, 
 
 Now the terraform changes need to be applied and published to an artifact, this can be done in another build pipeline. Finally, we can then create a new release and deploy the artifact. Again an agent will be required for deployment
 
+6. AppInsights
+
+Setting up AppInsights is simple for .net apps- you just need to initialise it in the Startup/Program file, and pass in your instrumentation key and connection string. These can be assigned via environment variables, 
+which in turn can be set in the terraform.
 
 
-
-This is the solution my team uses, I'm certainly not an expert on each of these steps, but I broadly understand the process. This system works well for us, as most of this is automated- the builds and releases are triggered by pull requests. In general, the only manual 
-change required is to update the helm chart version in the terraform.
+This is the solution my team uses, I'm certainly not an expert on each of these steps, but I broadly understand the process. This system works well for us, as most of this is automated- the builds and releases are 
+triggered by pull requests. In general, the only manual change required is to update the helm chart version in the terraform.
 As this is containerised, it means that each of the microservices can be independently (and automatically) scaled depending on the load to that particular service.
